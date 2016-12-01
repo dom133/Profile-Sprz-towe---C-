@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // zestaw atrybutów. Zmień wartości tych atrybutów, aby zmodyfikować informacje
 // powiązane z zestawem.
 [assembly: AssemblyTitle("Profile Sprzętowe")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Stworzone przez Dominik Kruszewski")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("dom133")]
 [assembly: AssemblyProduct("Profile Sprzętowe")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyCopyright("Copyright © dom133  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
