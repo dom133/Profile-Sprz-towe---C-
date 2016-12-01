@@ -111,25 +111,24 @@ namespace Profile_Sprzętowe
 
         private void chcancle_button_Click(object sender, EventArgs e)
         {
-            if (listBox1.SelectedIndex != -1){
-                dynamic json = SimpleJson.DeserializeObject(File.ReadAllText(directory + "\\changes.json"));
-                this.Enabled = false;
-                for (int i = 0; i <= json.Count - 1; i++) {
-                    System.Diagnostics.Process process = new System.Diagnostics.Process();
-                    System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-                    startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                    startInfo.WorkingDirectory = directory;
-                    startInfo.FileName = "cmd.exe";
-                    startInfo.Arguments = "/c devcon enable \"" + json[i] + "\"";
-                    process.StartInfo = startInfo;
-                    process.Start();
-                    process.WaitForExit();
-                }
-                this.Enabled = true;
-                File.Delete(directory + "\\changes.json");
-                MessageBox.Show("Poprawnie cofnięto zmiany", "Profile sprzętowe", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                chcancle_button.Enabled = false;
+            dynamic json = SimpleJson.DeserializeObject(File.ReadAllText(directory + "\\changes.json"));
+            this.Enabled = false;
+            for (int i = 0; i <= json.Count - 1; i++)
+            {
+                System.Diagnostics.Process process = new System.Diagnostics.Process();
+                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+                startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                startInfo.WorkingDirectory = directory;
+                startInfo.FileName = "cmd.exe";
+                startInfo.Arguments = "/c devcon enable \"" + json[i] + "\"";
+                process.StartInfo = startInfo;
+                process.Start();
+                process.WaitForExit();
             }
+            this.Enabled = true;
+            File.Delete(directory + "\\changes.json");
+            MessageBox.Show("Poprawnie cofnięto zmiany", "Profile sprzętowe", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            chcancle_button.Enabled = false;
         }
     }
 }
