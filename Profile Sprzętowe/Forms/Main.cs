@@ -20,32 +20,6 @@ namespace Profile_Sprzętowe
 
         public Main(){ InitializeComponent(); }
 
-        public static void editXml(string loc, string name_class, string name, string value)
-        {
-            XmlDocument doc = new XmlDocument();
-            doc.Load(loc);
-            doc.SelectSingleNode(name_class + "/" + name).InnerText = value;
-            doc.Save(loc);
-        }
-
-        public static string readXml(string loc, string name)
-        {
-            XmlDataDocument xmldoc = new XmlDataDocument();
-            XmlNodeList xmlnode;
-            FileStream fs = new FileStream(loc, FileMode.Open, FileAccess.Read);
-            xmldoc.Load(fs);
-            xmlnode = xmldoc.GetElementsByTagName(name);
-            try
-            {
-                fs.Close();
-                return xmlnode[0].ChildNodes.Item(0).InnerText.Trim();
-            }
-            catch
-            {
-                return "false";
-            }
-        }
-
         private void Main_Load(object sender, EventArgs e)
         {
             instance = this;
