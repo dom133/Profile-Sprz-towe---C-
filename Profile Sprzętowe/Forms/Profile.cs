@@ -17,7 +17,6 @@ namespace Profile_Sprzętowe.Forms
         public ArrayList id_hardware = new ArrayList();
         public ArrayList id_active = new ArrayList();
         public ArrayList name_active = new ArrayList();
-        public ArrayList to_remove = new ArrayList();
         private bool isClosed = false;
 
         public Profile(){ InitializeComponent(); }
@@ -57,6 +56,7 @@ namespace Profile_Sprzętowe.Forms
                 }
             } else {
                 save_button.Text = "Edytuj profil";
+                this.Text = "Edytuj profil";
                 dynamic json = SimpleJson.DeserializeObject(File.ReadAllText(directory+"\\"+Main.Instance.profiles[Main.Instance.chid]+".json"));
                 ArrayList tmp_id = new ArrayList();
                 ArrayList tmp_name = new ArrayList();
