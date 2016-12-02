@@ -17,12 +17,14 @@ namespace Profile_Sprzętowe
         public WebClient webClient = new WebClient();
         public ArrayList profiles = new ArrayList();
         public int chid = -1;
+        public bool isEdit = false;
 
         public Main(){ InitializeComponent(); }
 
         private void Main_Load(object sender, EventArgs e)
         {
             instance = this;
+
             //Create Main Dir
             if (!Directory.Exists(directory)) { Directory.CreateDirectory(directory); }
             if (!File.Exists(directory+"\\devcon.exe")) {
@@ -37,7 +39,7 @@ namespace Profile_Sprzętowe
                 for(int i=0; i<=profiles.Count-1; i++) { listBox1.Items.Add(profiles[i]); }
             }
 
-            if(File.Exists(directory+"\\changes.json")) { chcancle_button.Enabled = true; }
+            if(File.Exists(directory+"\\changes.json")) { chcancle_button.Visible = true; }
 
             //MessageBox.Show("is64bit: " + is64bit);
         }
@@ -59,13 +61,15 @@ namespace Profile_Sprzętowe
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (listBox1.SelectedIndex!=-1) {
-                chname_button.Enabled = true;
-                delete_button.Enabled = true;
-                save_button.Enabled = true;
+                chname_button.Visible = true;
+                delete_button.Visible = true;
+                save_button.Visible = true;
+                edit_button.Visible = true;
             } else {
-                chname_button.Enabled = false;
-                delete_button.Enabled = false;
-                save_button.Enabled = false;
+                chname_button.Visible = false;
+                delete_button.Visible = false;
+                save_button.Visible = false;
+                edit_button.Visible = false;
             }
         }
 
@@ -80,7 +84,7 @@ namespace Profile_Sprzętowe
 
         private void delete_button_Click(object sender, EventArgs e)
         {
-            if (listBox1.SelectedIndex != -1) { profiles.RemoveAt(listBox1.SelectedIndex); File.Delete(directory + "\\" + listBox1.SelectedItem + ".json"); listBox1.Items.RemoveAt(listBox1.SelectedIndex); }
+            if (listBox1.SelectedIndex != -1) { profiles.RemoveAt(listBox1.SelectedIndex); File.Delete(directory + "\\" + listBox1.SelectedItem + ".json"); listBox1.Items.RemoveAt(listBox1.SelectedIndex); File.WriteAllText(directory + "\\profiles.json", SimpleJson.SerializeObject(profiles)); }
         }
 
         private void save_button_Click(object sender, EventArgs e)
@@ -89,22 +93,25 @@ namespace Profile_Sprzętowe
                 this.Enabled = false;
                 dynamic json = SimpleJson.DeserializeObject(File.ReadAllText(directory + "\\" + listBox1.SelectedItem + ".json"));
                 ArrayList changes = new ArrayList();
-                for (int i=0; i<=json.Count-1; i++) {
-                    changes.Add(json[i]);
-                    string output = json[i];
-                    System.Diagnostics.Process process = new System.Diagnostics.Process();
-                    System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-                    startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                    startInfo.WorkingDirectory = directory;
-                    startInfo.FileName = "cmd.exe";
-                    startInfo.Arguments = "/c devcon disable \""+output+"\"";
-                    process.StartInfo = startInfo;
-                    process.Start();
-                    process.WaitForExit();
-                }
+                string args = "/c devcon disable \"" + json[1]["Value"][0] + "\"";
+                changes.Add(json[1]["Value"][0]);
+                for (int i=1; i<=json[1]["Value"].Count-1; i++) {
+                    changes.Add(json[1]["Value"][i]);
+                    args += " & devcon disable \"" + json[1]["Value"][i] + "\"";
+                }           
+
+                System.Diagnostics.Process process = new System.Diagnostics.Process();
+                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+                startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                startInfo.WorkingDirectory = directory;
+                startInfo.FileName = "cmd.exe";
+                startInfo.Arguments = args;
+                process.StartInfo = startInfo;
+                process.Start();
+                process.WaitForExit();
                 this.Enabled = true;
                 File.WriteAllText(directory + "\\changes.json", SimpleJson.SerializeObject(changes));
-                chcancle_button.Enabled = true;
+                chcancle_button.Visible = true;
                 MessageBox.Show("Poprawnie zastosowano profil, aby profil był aktywny w 100% należy uruchomić ponownie komputer", "Profile sprzętowe", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
@@ -113,22 +120,35 @@ namespace Profile_Sprzętowe
         {
             dynamic json = SimpleJson.DeserializeObject(File.ReadAllText(directory + "\\changes.json"));
             this.Enabled = false;
-            for (int i = 0; i <= json.Count - 1; i++)
+            string args = "/c devcon enable \"" + json[0] + "\"";
+            for (int i = 1; i <= json.Count - 1; i++)
             {
-                System.Diagnostics.Process process = new System.Diagnostics.Process();
-                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-                startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                startInfo.WorkingDirectory = directory;
-                startInfo.FileName = "cmd.exe";
-                startInfo.Arguments = "/c devcon enable \"" + json[i] + "\"";
-                process.StartInfo = startInfo;
-                process.Start();
-                process.WaitForExit();
+                args += " & devcon enable \"" + json[i] + "\"";
             }
+
+            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+            startInfo.WorkingDirectory = directory;
+            startInfo.FileName = "cmd.exe";
+            startInfo.Arguments = args;
+            process.StartInfo = startInfo;
+            process.Start();
+            process.WaitForExit();
             this.Enabled = true;
             File.Delete(directory + "\\changes.json");
             MessageBox.Show("Poprawnie cofnięto zmiany", "Profile sprzętowe", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            chcancle_button.Enabled = false;
+            chcancle_button.Visible = false;
+        }
+
+        private void edit_button_Click(object sender, EventArgs e)
+        {
+            if (listBox1.SelectedIndex != -1) {
+                chid = listBox1.SelectedIndex;
+                isEdit = true;
+                this.Enabled = false;
+                new Profile().Show();
+            }
         }
     }
 }

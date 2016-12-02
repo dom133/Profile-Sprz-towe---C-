@@ -80,7 +80,7 @@
             this.save_button.Name = "save_button";
             this.save_button.Size = new System.Drawing.Size(647, 23);
             this.save_button.TabIndex = 6;
-            this.save_button.Text = "Zapisz";
+            this.save_button.Text = "Utwórz profil";
             this.save_button.UseVisualStyleBackColor = true;
             this.save_button.Click += new System.EventHandler(this.save_button_Click);
             // 

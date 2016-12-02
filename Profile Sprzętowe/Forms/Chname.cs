@@ -42,6 +42,8 @@ namespace Profile_Sprzętowe.Forms
                     Main.Instance.listBox1.Items.RemoveAt(Main.Instance.chid);
                     Main.Instance.listBox1.Items.Insert(Main.Instance.chid, name_txt.Text);
                     MessageBox.Show("Poprawnie zmieniono nazwę!!!", "Profile sprzętowe", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    File.WriteAllText(directory + "\\profiles.json", SimpleJson.SerializeObject(Main.Instance.profiles));
+                    Main.Instance.chid = -1;
                     this.Close();
                 } else { MessageBox.Show("Podana nazwa jest już zajęta!!!", "Profile sprzętowe", MessageBoxButtons.OK, MessageBoxIcon.Information); }
             }
