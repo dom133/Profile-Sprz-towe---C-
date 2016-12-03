@@ -54,8 +54,9 @@ namespace Profile_Sprzętowe
 
         private void new_button_Click(object sender, EventArgs e)
         {
-            new Profile().Show();
+            new Wait().Show();
             this.Enabled = false;
+            new Profile().Show();           
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -76,9 +77,9 @@ namespace Profile_Sprzętowe
         private void chname_button_Click(object sender, EventArgs e)
         {
             if (listBox1.SelectedIndex != -1) {
-                chid = listBox1.SelectedIndex;
-                new Chname().Show();
-                this.Enabled = false; 
+                chid = listBox1.SelectedIndex;               
+                this.Enabled = false;
+                new Chname().Show();                 
             }
         }
 
@@ -90,7 +91,27 @@ namespace Profile_Sprzętowe
         private void save_button_Click(object sender, EventArgs e)
         {
             if (listBox1.SelectedIndex != -1) {
-                this.Enabled = false;
+                if (File.Exists(directory + "\\changes.json")) {
+                    dynamic json_changes = SimpleJson.DeserializeObject(File.ReadAllText(directory + "\\changes.json"));
+                    this.Enabled = false;
+                    string args_changes = "/c devcon enable \"" + json_changes[0] + "\"";
+                    for (int i = 1; i <= json_changes.Count - 1; i++)
+                    {
+                        args_changes += " & devcon enable \"" + json_changes[i] + "\"";
+                    }
+
+                    System.Diagnostics.Process process_changes = new System.Diagnostics.Process();
+                    System.Diagnostics.ProcessStartInfo startInfo_changes = new System.Diagnostics.ProcessStartInfo();
+                    startInfo_changes.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                    startInfo_changes.WorkingDirectory = directory;
+                    startInfo_changes.FileName = "cmd.exe";
+                    startInfo_changes.Arguments = args_changes;
+                    process_changes.StartInfo = startInfo_changes;
+                    process_changes.Start();
+                    process_changes.WaitForExit();
+                    File.Delete(directory + "\\changes.json");
+                }
+                
                 dynamic json = SimpleJson.DeserializeObject(File.ReadAllText(directory + "\\" + listBox1.SelectedItem + ".json"));
                 ArrayList changes = new ArrayList();
                 string args = "/c devcon disable \"" + json[1]["Value"][0] + "\"";
@@ -98,8 +119,7 @@ namespace Profile_Sprzętowe
                 for (int i=1; i<=json[1]["Value"].Count-1; i++) {
                     changes.Add(json[1]["Value"][i]);
                     args += " & devcon disable \"" + json[1]["Value"][i] + "\"";
-                }           
-
+                }
                 System.Diagnostics.Process process = new System.Diagnostics.Process();
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
                 startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
@@ -147,6 +167,7 @@ namespace Profile_Sprzętowe
                 chid = listBox1.SelectedIndex;
                 isEdit = true;
                 this.Enabled = false;
+                new Wait().Show();
                 new Profile().Show();
             }
         }
