@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -21,6 +22,20 @@ namespace Profile_Sprzętowe
 
         public Main(){ InitializeComponent(); }
 
+        public static bool IsConnectedToInternet()
+        {
+            string host = "google.pl";
+            Ping p = new Ping();
+            try
+            {
+                PingReply reply = p.Send(host, 3000);
+                if (reply.Status == IPStatus.Success)
+                    return true;
+            }
+            catch { }
+            return false;
+        }
+
         private void Main_Load(object sender, EventArgs e)
         {
             instance = this;
@@ -28,8 +43,11 @@ namespace Profile_Sprzętowe
             //Create Main Dir
             if (!Directory.Exists(directory)) { Directory.CreateDirectory(directory); }
             if (!File.Exists(directory+"\\devcon.exe")) {
-                if (!is64bit) { webClient.DownloadFile("https://www.dropbox.com/s/1s7jgr0clv5g1rd/devconx32.exe?dl=1", directory + "\\devcon.exe");
-                } else { webClient.DownloadFile("https://www.dropbox.com/s/q0z3j70g1fbquj9/devconx64.exe?dl=1", directory + "\\devcon.exe"); }
+                if (IsConnectedToInternet())
+                {
+                    if (!is64bit){ webClient.DownloadFile("https://www.dropbox.com/s/1s7jgr0clv5g1rd/devconx32.exe?dl=1", directory + "\\devcon.exe"); }
+                    else { webClient.DownloadFile("https://www.dropbox.com/s/q0z3j70g1fbquj9/devconx64.exe?dl=1", directory + "\\devcon.exe"); }
+                } else { MessageBox.Show("Brak połączenia z ineternetem, aplikacja wymaga połączenia z internetem podczas pierwszego uruchomienia", "Profile Sprzętowe"); Application.Exit(); }
             }
 
             //Load profiles if exist
@@ -46,10 +64,14 @@ namespace Profile_Sprzętowe
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (MessageBox.Show("Czy na pewno chcesz zamknąć aplikacje?", "Profile Sprzętowe", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+            if (e.CloseReason != CloseReason.ApplicationExitCall)
             {
-                e.Cancel = true;               
-            } else { File.WriteAllText(directory + "\\profiles.json", SimpleJson.SerializeObject(profiles)); }
+                if (MessageBox.Show("Czy na pewno chcesz zamknąć aplikacje?", "Profile Sprzętowe", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                {
+                    e.Cancel = true;
+                }
+                else { File.WriteAllText(directory + "\\profiles.json", SimpleJson.SerializeObject(profiles)); }
+            }
         }
 
         private void new_button_Click(object sender, EventArgs e)
@@ -100,15 +122,18 @@ namespace Profile_Sprzętowe
                         args_changes += " & devcon enable \"" + json_changes[i] + "\"";
                     }
 
-                    System.Diagnostics.Process process_changes = new System.Diagnostics.Process();
-                    System.Diagnostics.ProcessStartInfo startInfo_changes = new System.Diagnostics.ProcessStartInfo();
-                    startInfo_changes.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                    startInfo_changes.WorkingDirectory = directory;
-                    startInfo_changes.FileName = "cmd.exe";
-                    startInfo_changes.Arguments = args_changes;
-                    process_changes.StartInfo = startInfo_changes;
-                    process_changes.Start();
-                    process_changes.WaitForExit();
+                    for (int i = 0; i <= 1; i++)
+                    {
+                        System.Diagnostics.Process process_changes = new System.Diagnostics.Process();
+                        System.Diagnostics.ProcessStartInfo startInfo_changes = new System.Diagnostics.ProcessStartInfo();
+                        startInfo_changes.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                        startInfo_changes.WorkingDirectory = directory;
+                        startInfo_changes.FileName = "cmd.exe";
+                        startInfo_changes.Arguments = args_changes;
+                        process_changes.StartInfo = startInfo_changes;
+                        process_changes.Start();
+                        process_changes.WaitForExit();
+                    }
                     File.Delete(directory + "\\changes.json");
                 }
                 
@@ -146,15 +171,18 @@ namespace Profile_Sprzętowe
                 args += " & devcon enable \"" + json[i] + "\"";
             }
 
-            System.Diagnostics.Process process = new System.Diagnostics.Process();
-            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            startInfo.WorkingDirectory = directory;
-            startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = args;
-            process.StartInfo = startInfo;
-            process.Start();
-            process.WaitForExit();
+            for (int i = 0; i <= 1; i++)
+            {
+                System.Diagnostics.Process process = new System.Diagnostics.Process();
+                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+                startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                startInfo.WorkingDirectory = directory;
+                startInfo.FileName = "cmd.exe";
+                startInfo.Arguments = args;
+                process.StartInfo = startInfo;
+                process.Start();
+                process.WaitForExit();
+            }
             this.Enabled = true;
             File.Delete(directory + "\\changes.json");
             MessageBox.Show("Poprawnie cofnięto zmiany", "Profile sprzętowe", MessageBoxButtons.OK, MessageBoxIcon.Information);
