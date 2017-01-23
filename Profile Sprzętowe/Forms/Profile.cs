@@ -17,6 +17,7 @@ namespace Profile_Sprzętowe.Forms
         public ArrayList id_hardware = new ArrayList();
         public ArrayList id_active = new ArrayList();
         public ArrayList name_active = new ArrayList();
+        Class.Console console = new Class.Console();
         private bool isClosed = false;
 
         public Profile(){ InitializeComponent(); }
@@ -27,15 +28,7 @@ namespace Profile_Sprzętowe.Forms
             instance = this;
 
             //Read peripheral list
-            System.Diagnostics.Process process = new System.Diagnostics.Process();
-            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            startInfo.WorkingDirectory = directory;
-            startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = "/c devcon find * > list.txt";
-            process.StartInfo = startInfo;
-            process.Start();
-            process.WaitForExit();
+            console.sendCmdCommand("/c devcon find * > list.txt", directory, false);
             Wait.Instance.updateProgressBar(40);
             if (!Main.Instance.isEdit) {
                 string line;
@@ -49,17 +42,9 @@ namespace Profile_Sprzętowe.Forms
                         string output = temp_line[0];
                         string name = temp_line[1];
                         output = Regex.Replace(output, @"\s+", "");
-                        int index = output.LastIndexOf("\\");
-                        if (index > 0) { output = output.Substring(0, index); }
-                        System.Diagnostics.Process process_ch = new System.Diagnostics.Process();
-                        System.Diagnostics.ProcessStartInfo startInfo_ch = new System.Diagnostics.ProcessStartInfo();
-                        startInfo_ch.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                        startInfo_ch.WorkingDirectory = directory;
-                        startInfo_ch.FileName = "cmd.exe";
-                        startInfo_ch.Arguments = "/c devcon hwids \"" + output + "\" > out.txt";
-                        process_ch.StartInfo = startInfo_ch;
-                        process_ch.Start();
-                        process_ch.WaitForExit();
+                        int index_1 = output.LastIndexOf("\\");
+                        if (index_1 > 0) { output = output.Substring(0, index_1); }
+                        console.sendCmdCommand("/c devcon hwids \"" + output + "\" > out.txt", directory, false);
                         Wait.Instance.updateProgressBar(70);
                         System.IO.StreamReader outline = new System.IO.StreamReader(directory + "\\out.txt");
                         if (outline.ReadLine() != "No matching devices found.")
@@ -102,15 +87,7 @@ namespace Profile_Sprzętowe.Forms
                         output = Regex.Replace(output, @"\s+", "");
                         int index = output.LastIndexOf("\\");
                         if (index > 0) { output = output.Substring(0, index); }
-                        System.Diagnostics.Process process_ch = new System.Diagnostics.Process();
-                        System.Diagnostics.ProcessStartInfo startInfo_ch = new System.Diagnostics.ProcessStartInfo();
-                        startInfo_ch.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                        startInfo_ch.WorkingDirectory = directory;
-                        startInfo_ch.FileName = "cmd.exe";
-                        startInfo_ch.Arguments = "/c devcon hwids \""+output+"\" > out.txt";
-                        process_ch.StartInfo = startInfo_ch;
-                        process_ch.Start();
-                        process_ch.WaitForExit();
+                        console.sendCmdCommand("/c devcon hwids \"" + output + "\" > out.txt", directory, false);
                         Wait.Instance.updateProgressBar(80);
                         System.IO.StreamReader outline = new System.IO.StreamReader(directory + "\\out.txt");
                         if (outline.ReadLine() != "No matching devices found.") {

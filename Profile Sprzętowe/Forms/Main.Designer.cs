@@ -38,6 +38,7 @@
             this.save_button = new System.Windows.Forms.ToolStripMenuItem();
             this.chcancle_button = new System.Windows.Forms.ToolStripMenuItem();
             this.delete_button = new System.Windows.Forms.ToolStripMenuItem();
+            this.opcjeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -58,22 +59,23 @@
             this.chname_button,
             this.save_button,
             this.chcancle_button,
-            this.delete_button});
+            this.delete_button,
+            this.opcjeToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.ShowImageMargin = false;
-            this.contextMenuStrip1.Size = new System.Drawing.Size(123, 136);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(128, 180);
             // 
             // new_button
             // 
             this.new_button.Name = "new_button";
-            this.new_button.Size = new System.Drawing.Size(122, 22);
+            this.new_button.Size = new System.Drawing.Size(127, 22);
             this.new_button.Text = "Nowy Profil";
             this.new_button.Click += new System.EventHandler(this.new_button_Click);
             // 
             // edit_button
             // 
             this.edit_button.Name = "edit_button";
-            this.edit_button.Size = new System.Drawing.Size(122, 22);
+            this.edit_button.Size = new System.Drawing.Size(127, 22);
             this.edit_button.Text = "Edytuj";
             this.edit_button.Visible = false;
             this.edit_button.Click += new System.EventHandler(this.edit_button_Click);
@@ -81,7 +83,7 @@
             // chname_button
             // 
             this.chname_button.Name = "chname_button";
-            this.chname_button.Size = new System.Drawing.Size(122, 22);
+            this.chname_button.Size = new System.Drawing.Size(127, 22);
             this.chname_button.Text = "Zmień nazwę";
             this.chname_button.Visible = false;
             this.chname_button.Click += new System.EventHandler(this.chname_button_Click);
@@ -89,7 +91,7 @@
             // save_button
             // 
             this.save_button.Name = "save_button";
-            this.save_button.Size = new System.Drawing.Size(122, 22);
+            this.save_button.Size = new System.Drawing.Size(127, 22);
             this.save_button.Text = "Zastosuj";
             this.save_button.Visible = false;
             this.save_button.Click += new System.EventHandler(this.save_button_Click);
@@ -97,7 +99,7 @@
             // chcancle_button
             // 
             this.chcancle_button.Name = "chcancle_button";
-            this.chcancle_button.Size = new System.Drawing.Size(122, 22);
+            this.chcancle_button.Size = new System.Drawing.Size(127, 22);
             this.chcancle_button.Text = "Cofnij zmiany";
             this.chcancle_button.Visible = false;
             this.chcancle_button.Click += new System.EventHandler(this.chcancle_button_Click);
@@ -105,10 +107,17 @@
             // delete_button
             // 
             this.delete_button.Name = "delete_button";
-            this.delete_button.Size = new System.Drawing.Size(122, 22);
+            this.delete_button.Size = new System.Drawing.Size(127, 22);
             this.delete_button.Text = "Usuń";
             this.delete_button.Visible = false;
             this.delete_button.Click += new System.EventHandler(this.delete_button_Click);
+            // 
+            // opcjeToolStripMenuItem
+            // 
+            this.opcjeToolStripMenuItem.Name = "opcjeToolStripMenuItem";
+            this.opcjeToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+            this.opcjeToolStripMenuItem.Text = "Opcje";
+            this.opcjeToolStripMenuItem.Click += new System.EventHandler(this.opcjeToolStripMenuItem_Click);
             // 
             // Main
             // 
@@ -139,6 +148,7 @@
         private System.Windows.Forms.ToolStripMenuItem chcancle_button;
         private System.Windows.Forms.ToolStripMenuItem delete_button;
         private System.Windows.Forms.ToolStripMenuItem edit_button;
+        private System.Windows.Forms.ToolStripMenuItem opcjeToolStripMenuItem;
     }
 }
 

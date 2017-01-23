@@ -1,4 +1,5 @@
-﻿using Profile_Sprzętowe.Forms;
+﻿using Profile_Sprzętowe.Class;
+using Profile_Sprzętowe.Forms;
 using System;
 using System.Collections;
 using System.IO;
@@ -17,6 +18,7 @@ namespace Profile_Sprzętowe
         public string directory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\HM";
         public WebClient webClient = new WebClient();
         public ArrayList profiles = new ArrayList();
+        Class.Console console = new Class.Console();
         public int chid = -1;
         public bool isEdit = false;
 
@@ -39,7 +41,7 @@ namespace Profile_Sprzętowe
         private void Main_Load(object sender, EventArgs e)
         {
             instance = this;
-
+            this.Text = this.Text + " V" + this.ProductVersion + " by dom133";
             //Create Main Dir
             if (!Directory.Exists(directory)) { Directory.CreateDirectory(directory); }
             if (!File.Exists(directory+"\\devcon.exe")) {
@@ -52,6 +54,8 @@ namespace Profile_Sprzętowe
 
             //Load profiles if exist
             if(File.Exists(directory+"\\profiles.json")) {
+                int active = -1;
+                if(File.Exists(directory+"\\active.txt")) { active = Convert.ToInt32(File.ReadAllText(directory+"\\active.txt")); }
                 dynamic json = SimpleJson.DeserializeObject(File.ReadAllText(directory+"\\profiles.json"));
                 for(int i=0; i<=json.Count-1; i++){ profiles.Add(json[i]); }
                 for(int i=0; i<=profiles.Count-1; i++) { listBox1.Items.Add(profiles[i]); }
@@ -108,6 +112,7 @@ namespace Profile_Sprzętowe
         private void delete_button_Click(object sender, EventArgs e)
         {
             if (listBox1.SelectedIndex != -1) { profiles.RemoveAt(listBox1.SelectedIndex); File.Delete(directory + "\\" + listBox1.SelectedItem + ".json"); listBox1.Items.RemoveAt(listBox1.SelectedIndex); File.WriteAllText(directory + "\\profiles.json", SimpleJson.SerializeObject(profiles)); }
+            MessageBox.Show("Poprawnie usunięto profil!!!");
         }
 
         private void save_button_Click(object sender, EventArgs e)
@@ -121,18 +126,10 @@ namespace Profile_Sprzętowe
                     {
                         args_changes += " & devcon enable \"" + json_changes[i] + "\"";
                     }
-
+                    
                     for (int i = 0; i <= 1; i++)
                     {
-                        System.Diagnostics.Process process_changes = new System.Diagnostics.Process();
-                        System.Diagnostics.ProcessStartInfo startInfo_changes = new System.Diagnostics.ProcessStartInfo();
-                        startInfo_changes.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                        startInfo_changes.WorkingDirectory = directory;
-                        startInfo_changes.FileName = "cmd.exe";
-                        startInfo_changes.Arguments = args_changes;
-                        process_changes.StartInfo = startInfo_changes;
-                        process_changes.Start();
-                        process_changes.WaitForExit();
+                        console.sendCmdCommand(args_changes, directory, false);
                     }
                     File.Delete(directory + "\\changes.json");
                 }
@@ -145,16 +142,11 @@ namespace Profile_Sprzętowe
                     changes.Add(json[1]["Value"][i]);
                     args += " & devcon disable \"" + json[1]["Value"][i] + "\"";
                 }
-                System.Diagnostics.Process process = new System.Diagnostics.Process();
-                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-                startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                startInfo.WorkingDirectory = directory;
-                startInfo.FileName = "cmd.exe";
-                startInfo.Arguments = args;
-                process.StartInfo = startInfo;
-                process.Start();
-                process.WaitForExit();
+
+                console.sendCmdCommand(args, directory, false);
+
                 this.Enabled = true;
+                File.Delete(directory + "\\active.txt"); File.WriteAllText(directory + "\\active.txt", Convert.ToString(listBox1.SelectedIndex));
                 File.WriteAllText(directory + "\\changes.json", SimpleJson.SerializeObject(changes));
                 chcancle_button.Visible = true;
                 MessageBox.Show("Poprawnie zastosowano profil, aby profil był aktywny w 100% należy uruchomić ponownie komputer", "Profile sprzętowe", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -173,18 +165,10 @@ namespace Profile_Sprzętowe
 
             for (int i = 0; i <= 1; i++)
             {
-                System.Diagnostics.Process process = new System.Diagnostics.Process();
-                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-                startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                startInfo.WorkingDirectory = directory;
-                startInfo.FileName = "cmd.exe";
-                startInfo.Arguments = args;
-                process.StartInfo = startInfo;
-                process.Start();
-                process.WaitForExit();
+                console.sendCmdCommand(args, directory, false);
             }
             this.Enabled = true;
-            File.Delete(directory + "\\changes.json");
+            File.Delete(directory + "\\changes.json"); File.Delete(directory + "\\active.txt");
             MessageBox.Show("Poprawnie cofnięto zmiany", "Profile sprzętowe", MessageBoxButtons.OK, MessageBoxIcon.Information);
             chcancle_button.Visible = false;
         }
@@ -198,6 +182,11 @@ namespace Profile_Sprzętowe
                 new Wait().Show();
                 new Profile().Show();
             }
+        }
+
+        private void opcjeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new Options().Show();
         }
     }
 }
